@@ -9,7 +9,7 @@ env:
   PROJECT_NAME: testinium-logo-service-7wxnl689
   AWS_REGION: us-west-1
   ECS_CLUSTER: testinium-cluster
-  PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium-logo-service-7wxnl689
+  PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium
 
 jobs:
   buildDockerImage:
