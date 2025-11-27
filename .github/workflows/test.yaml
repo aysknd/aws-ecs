@@ -1,55 +1,42 @@
-name: Docker build job
+name: Build and Deploy to ECS
 
 on:
   push:
     branches:
       - main
 
-env:
-  PROJECT_NAME: testinium-logo-service-7wxnl689
-  AWS_REGION: us-west-1
-  ECS_CLUSTER: testinium-cluster
-  PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium
-
 jobs:
-  buildDockerImage:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write  # OIDC token için
+      contents: read
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Set short sha
-        id: sha_short
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::737062070137:role/GitHubActionsECSDeployRole
+          aws-region: us-west-1
 
-      - name: Login to Amazon ECR Public
-        run: |
-          aws ecr-public get-login-password --region us-east-1 | \
-          docker login --username AWS --password-stdin public.ecr.aws
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build & Push Docker image to Public ECR
+      - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
-          platforms: linux/amd64
+          file: ./Dockerfile
           push: true
-          tags: |
-            ${{ env.PUBLIC_ECR_URI }}:${{ steps.sha_short.outputs.sha_short }}
-            ${{ env.PUBLIC_ECR_URI }}:latest
+          tags: public.ecr.aws/h7j5l7r8/testinium-logo-service-7wxnl689:latest
 
-      - name: Restart ECS service (pull latest)
+      - name: Update ECS service
         run: |
           aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.PROJECT_NAME }}-service \
-            --region ${{ env.AWS_REGION }} \
+            --cluster testinium-cluster \
+            --service testinium-logo-service-7wxnl689-service \
             --force-new-deployment
