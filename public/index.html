@@ -1,38 +1,95 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Testinium</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gülmez Gemi Boru Döşeme</title>
   <style>
-    body { font-family: Inter, Arial, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f5f7fb; }
-    .card { background:white; padding:32px; border-radius:12px; box-shadow:0 8px 30px rgba(18,38,63,0.08); text-align:center; width:360px; }
-    img.logo { width:96px; height:96px; margin-bottom:16px; }
-    h1 { margin:0 0 8px; font-size:22px; color:#0f1724; }
-    p { margin:0; color:#475569; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { line-height: 1.6; background-color: #f0f4f8; color: #333; }
+
+    header { background-color: #0a3d62; color: white; padding: 20px 0; text-align: center; }
+    header h1 { font-size: 2.5em; margin-bottom: 10px; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: 600; }
+    nav a:hover { text-decoration: underline; }
+
+    .hero { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1563306406-85d4f1d18623?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8Ym9ydXxlbnwwfHx8fDE2OTgxOTUxNDc&ixlib=rb-4.0.3&q=80&w=1080') center/cover no-repeat; color: white; text-align: center; padding: 120px 20px; }
+    .hero h2 { font-size: 2.5em; margin-bottom: 20px; }
+    .hero p { font-size: 1.2em; margin-bottom: 30px; }
+    .hero a { background-color: #ff6b6b; color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+    .hero a:hover { background-color: #ee5253; }
+
+    .section { max-width: 1000px; margin: 50px auto; padding: 20px; }
+    .section h3 { text-align: center; margin-bottom: 40px; color: #0a3d62; font-size: 2em; }
+
+    .services { display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px; }
+    .service-card { background-color: white; padding: 30px 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; flex: 1 1 250px; }
+    .service-card h4 { margin-bottom: 15px; color: #ff6b6b; }
+    .service-card p { font-size: 1em; color: #555; }
+
+    .contact { background-color: #0a3d62; color: white; padding: 40px 20px; border-radius: 15px; text-align: center; }
+    .contact p { margin-bottom: 10px; }
+    .contact a { color: #ff6b6b; text-decoration: none; font-weight: bold; }
+    .contact a:hover { text-decoration: underline; }
+
+    footer { text-align: center; padding: 20px 0; background-color: #1e3799; color: white; margin-top: 40px; }
+
+    @media (max-width: 768px) {
+      .services { flex-direction: column; align-items: center; }
+      nav a { display: block; margin: 10px 0; }
+      .hero h2 { font-size: 2em; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img class="logo" src="./logo.svg" alt="Testinium logo">
-    <h1>wellcome to testinium</h1>
-    <p>Hazır sunum — commit ile otomatik deploy yapılandırıldı.</p>
-    <p>Hazır sunum — ayşedeğişiklikyapıyor.</p>
+
+<header>
+  <h1>Gülmez Gemi Boru Döşeme</h1>
+  <nav>
+    <a href="#services">Hizmetlerimiz</a>
+    <a href="#contact">İletişim</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Deneyimli Ekip ile Güvenilir Boru Döşeme</h2>
+  <p>Gemi boru döşeme, montaj ve bakımda profesyonel çözümler sunuyoruz.</p>
+  <a href="#contact">Bize Ulaşın</a>
+</section>
+
+<section class="section" id="services">
+  <h3>Hizmetlerimiz</h3>
+  <div class="services">
+    <div class="service-card">
+      <h4>🔧 Boru Döşeme</h4>
+      <p>Modern ekipmanlarla hızlı ve güvenli boru döşeme hizmeti.</p>
+    </div>
+    <div class="service-card">
+      <h4>🛠️ Montaj ve Bakım</h4>
+      <p>Periyodik bakım ve profesyonel montaj ile uzun ömürlü sistemler.</p>
+    </div>
+    <div class="service-card">
+      <h4>📐 Proje Danışmanlığı</h4>
+      <p>Projenize özel çözüm önerileri ve teknik danışmanlık sağlıyoruz.</p>
+    </div>
+    <div class="service-card">
+      <h4>✅ Kalite Kontrol</h4>
+      <p>Tüm boru sistemleri test edilerek güvenilirlik garantisi sunulur.</p>
+    </div>
   </div>
-  <div class="card">
-    <img class="logo" src="./logo.svg" alt="Testinium logo">
-    <h1>güle güle </h1>
-    <p>değiştiiii.</p>
-    <p>otomatikkk</p>
-  </div>
-  <div class="card">
-    <img class="logo" src="./logo.svg" alt="Testinium logo">
-    <h1>değişiklikk </h1>
-    <p>değiştiiii.</p>
-    <p>otomatikkk</p>
-  </div>
+</section>
+
+<section class="section contact" id="contact">
+  <h3>İletişim</h3>
+  <p>Email: <a href="mailto:info@gulmezgemiboru.com">info@gulmezgemiboru.com</a></p>
+  <p>Telefon: <a href="tel:+905551234567">+90 555 123 4567</a></p>
+  <p>Adres: Gemi Yolu Mah. No:12, İstanbul</p>
+  <p>Bize hemen ulaşın ve projenizi başlatalım!</p>
+</section>
+
+<footer>
+  &copy; 2025 Gülmez Gemi Boru Döşeme. Tüm hakları saklıdır.
+</footer>
+
 </body>
 </html>
-
-
-
