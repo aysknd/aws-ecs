@@ -1,22 +1,21 @@
+name: Build & Deploy to ECS
 
 on:
   workflow_dispatch:      # Elle tetikleme
   push:
     branches: [ main ]   # main'e push olduğunda çalışır
+
 env:
   PROJECT_NAME: testinium-logo-service-7wxnl689
   AWS_REGION: us-west-2
   ECS_CLUSTER: testinium-cluster
   PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium
 
-
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-      
 
-
-    # 🔑 OIDC için GEREKLİ izinler
+    # 🔑 OIDC için gerekli izinler
     permissions:
       id-token: write
       contents: read
@@ -39,6 +38,10 @@ jobs:
           aws ecr-public get-login-password --region us-east-1 | \
           docker login --username AWS --password-stdin public.ecr.aws
 
+      - name: Get short SHA
+        id: sha_short
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Build & Push Docker image to Public ECR
         uses: docker/build-push-action@v6
         with:
@@ -57,6 +60,3 @@ jobs:
             --service ${{ env.PROJECT_NAME }}-service \
             --region ${{ env.AWS_REGION }} \
             --force-new-deployment
-
-        
-
