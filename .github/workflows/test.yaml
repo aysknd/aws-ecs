@@ -1,58 +1,37 @@
-name: Docker build job
+name: Connect to an AWS role from a GitHub repository
 
+# İş akışının tetikleneceği durumlar
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
-  PROJECT_NAME: testinium-logo-service-7wxnl689
-  AWS_REGION: us-west-1
-  ECS_CLUSTER: testinium-cluster
-  PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium
+  AWS_REGION: us-west-1   # Kaynaklarınızın bulunduğu AWS Bölgesi
+
+# İş akışı ve job seviyesinde izinler
+permissions:
+  id-token: write   # OIDC için gerekli
+  contents: read    # actions/checkout için gerekli
 
 jobs:
-  buildDockerImage:
+  AssumeRoleAndCallIdentity:
     runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write   # OIDC için
-      contents: read
-
     steps:
-      - name: Checkout code
+      # Repo kodunu çek
+      - name: Git clone the repository
         uses: actions/checkout@v3
 
-      - name: Set short sha
-        id: sha_short
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      # AWS rolünü üstlen ve credentials ayarla
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           role-to-assume: arn:aws:iam::737062070137:role/odic-deneme
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR Public
+      # AWS CLI ile kimlik doğrulama testi
+      - name: STS GetCallerIdentity
         run: |
-          aws ecr-public get-login-password --region us-east-1 | \
-          docker login --username AWS --password-stdin public.ecr.aws
-
-      - name: Build & Push Docker image to Public ECR
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ${{ env.PUBLIC_ECR_URI }}:${{ steps.sha_short.outputs.sha_short }}
-            ${{ env.PUBLIC_ECR_URI }}:latest
-
-      - name: Restart ECS service (pull latest)
-        run: |
-          aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.PROJECT_NAME }}-service \
-            --region ${{ env.AWS_REGION }} \
-            --force-new-deployment
+          aws sts get-caller-identity
