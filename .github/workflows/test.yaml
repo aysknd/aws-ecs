@@ -1,9 +1,9 @@
-name: Build & Deploy to ECS
+name: Docker build job
 
 on:
-  workflow_dispatch:      # Elle tetikleme
   push:
-    branches: [ main ]   # main'e push olduğunda çalışır
+    branches:
+      - main
 
 env:
   PROJECT_NAME: testinium-logo-service-7wxnl689
@@ -12,35 +12,28 @@ env:
   PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium
 
 jobs:
-  deploy-dev:
+  buildDockerImage:
     runs-on: ubuntu-latest
 
-    # 🔑 OIDC için gerekli izinler
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials (OIDC)
+      - name: Set short sha
+        id: sha_short
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::737062070137:role/github-odic
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Who am I? (debug)
-        run: aws sts get-caller-identity
 
       - name: Login to Amazon ECR Public
         run: |
           aws ecr-public get-login-password --region us-east-1 | \
           docker login --username AWS --password-stdin public.ecr.aws
-
-      - name: Get short SHA
-        id: sha_short
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build & Push Docker image to Public ECR
         uses: docker/build-push-action@v6
@@ -60,3 +53,4 @@ jobs:
             --service ${{ env.PROJECT_NAME }} \
             --region ${{ env.AWS_REGION }} \
             --force-new-deployment
+ 
