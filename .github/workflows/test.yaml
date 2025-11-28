@@ -3,13 +3,17 @@ on:
   workflow_dispatch:      # Elle tetikleme
   push:
     branches: [ main ]   # main'e push olduğunda çalışır
+env:
+  PROJECT_NAME: testinium-logo-service-7wxnl689
+  AWS_REGION: us-west-2
+  ECS_CLUSTER: testinium-cluster
+  PUBLIC_ECR_URI: public.ecr.aws/h7j5l7r8/testinium
+
 
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-
-    env:
-      AWS_REGION: us-west-2 
+      
 
 
     # 🔑 OIDC için GEREKLİ izinler
@@ -29,4 +33,30 @@ jobs:
 
       - name: Who am I? (debug)
         run: aws sts get-caller-identity
+
+      - name: Login to Amazon ECR Public
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | \
+          docker login --username AWS --password-stdin public.ecr.aws
+
+      - name: Build & Push Docker image to Public ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.PUBLIC_ECR_URI }}:${{ steps.sha_short.outputs.sha_short }}
+            ${{ env.PUBLIC_ECR_URI }}:latest
+
+      - name: Restart ECS service (pull latest)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.PROJECT_NAME }}-service \
+            --region ${{ env.AWS_REGION }} \
+            --force-new-deployment
+
+        
 
